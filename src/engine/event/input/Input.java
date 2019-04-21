@@ -55,12 +55,17 @@ public class Input {
 		new Thread("input") {
 			@Override public void run() {
 				
-				while(window.isOpen()) {
+				while(true) {
+					
+					window.acquireLock();
+					if(!window.isOpen()) break;
 					
 					updateKeyboard();
 					updateMouseClicks();
 					updateCursor();
 					updateScrollWheel();
+					
+					window.releaseLock();
 				}
 			}
 		}.start();

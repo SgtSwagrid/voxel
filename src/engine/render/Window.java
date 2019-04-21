@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ContextAttribs;
@@ -16,7 +17,6 @@ import org.lwjgl.opengl.PixelFormat;
 
 import engine.util.Colour;
 import engine.event.Event;
-import engine.event.input.Input;
 
 public class Window {
 	
@@ -38,6 +38,8 @@ public class Window {
 	private Colour colour = Colour.BLACK;
 	
 	private int maxFps = 240;
+	
+	private Semaphore lock = new Semaphore(1);
 	
 	static {
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
@@ -127,10 +129,14 @@ public class Window {
 					update();
 					renderers.forEach(Renderer::doRender);
 				}
-				renderers.forEach(Renderer::destroy);
 				
+				acquireLock();
+				
+				renderers.forEach(Renderer::destroy);
 				Display.destroy();
 				open = false;
+				
+				releaseLock();
 			}
 		}.start();
 		
@@ -233,5 +239,17 @@ public class Window {
 			HEIGHT = height;
 			trigger();
 		}
+	}
+	
+	public void acquireLock() {
+		try {
+			lock.acquire();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void releaseLock() {
+		lock.release();
 	}
 }

@@ -36,6 +36,5 @@ public class Client {
 		
 		Event.addHandler(GameTickEvent.class, e ->
 				cube.getTransform().rotate(new Vector3f(0.5F, 0.0F, 0.0F)));
-			
 	}
 }
