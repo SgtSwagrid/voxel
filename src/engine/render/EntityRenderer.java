@@ -14,11 +14,9 @@ import org.lwjgl.util.vector.Vector3f;
 
 import engine.entity.Entity;
 import engine.entity.World;
-import engine.event.Event;
 import engine.model.Material;
 import engine.model.Mesh;
 import engine.model.Texture;
-import engine.render.Window.WindowResizeEvent;
 import engine.render.light.DirectionalLight;
 import engine.temp.Shapes;
 import engine.util.Colour;

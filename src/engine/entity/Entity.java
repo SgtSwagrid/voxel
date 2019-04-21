@@ -5,21 +5,26 @@ import engine.util.math.Transform;
 
 public abstract class Entity {
 	
-	private Transform transf = new Transform();
+	private World world;
+	
+	private Transform transf;
 	
 	private Model model;
 	
 	public Entity(World world, Model model) {
-		this.model = model;
-		world.addEntity(this);
+		this(world, model, new Transform());
 	}
 	
 	public Entity(World world, Model model, Transform transform) {
-		this(world, model);
+		this.world = world;
+		this.model = model;
+		world.addEntity(this);
 		transf.loadTransformation(transform);
 	}
 	
 	public Model getModel() { return model; }
 	
 	public Transform getTransform() { return transf; }
+	
+	public void delete() { world.removeEntity(this); }
 }
