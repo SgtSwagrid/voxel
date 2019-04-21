@@ -1,0 +1,51 @@
+#version 400 core
+
+in vec3 vertex_;
+in vec2 texmap_;
+in vec3 normal_;
+
+in vec3 cameraPos;
+
+out vec4 colour_;
+
+struct Light {
+	vec4 colour;
+	vec3 direction;
+};
+
+uniform Light[4] lights;
+
+struct Material {
+	vec4 colour;
+	float ambientLight, diffuseLight, specularLight;
+	int specularDamping;
+};
+
+uniform Material material;
+uniform sampler2D sampler;
+
+void main(void) {
+
+	vec4 ambient = vec4(vec3(material.ambientLight), 1.0);
+	
+	vec4 diffuse = vec4(0.0);
+	vec3 normal = normalize(normal_);
+	
+	for(int i = 0; i < 4; i++) {
+		vec3 direction = normalize(lights[i].direction);
+		diffuse += material.diffuseLight * lights[i].colour * dot(-normal, direction);
+	}
+	diffuse = max(diffuse, 0.0);
+	
+	vec4 specular = vec4(0.0);
+	vec3 toCamera = normalize(cameraPos - vertex_);
+	
+	for(int i = 0; i < 4; i++) {
+		vec3 direction = -normalize(lights[i].direction);
+		vec3 reflectedDir = reflect(-direction, normal);
+		specular += max(material.specularLight * lights[i].colour
+			* pow(dot(toCamera, reflectedDir), material.specularDamping), 0.0);
+	}
+	
+	colour_ = (ambient + diffuse + specular) * material.colour * texture(sampler, texmap_);
+}

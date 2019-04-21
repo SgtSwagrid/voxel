@@ -1,0 +1,26 @@
+#version 400 core
+
+in vec3 vertex;
+in vec2 texmap;
+in vec3 normal;
+
+out vec3 vertex_;
+out vec2 texmap_;
+out vec3 normal_;
+
+out vec3 cameraPos;
+
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
+void main(void) {
+	
+	gl_Position = projection * view * model * vec4(vertex, 1.0);
+	
+	vertex_ = vec3(model * vec4(vertex, 1.0));
+	texmap_ = texmap;
+	normal_ = vec3(model * vec4(normal, 0.0));
+	
+	cameraPos = vec3(inverse(view) * vec4(vec3(0.0), 1.0));
+}
