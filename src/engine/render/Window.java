@@ -17,12 +17,13 @@ import org.lwjgl.opengl.PixelFormat;
 
 import engine.util.Colour;
 import engine.event.Event;
+import engine.render.shader.Shader;
 
 public class Window {
 	
 	private static final int SCREEN_WIDTH, SCREEN_HEIGHT;
 	
-	private List<Renderer> renderers = new LinkedList<>();
+	private List<Shader> shaders = new LinkedList<>();
 	
 	private volatile int
 			width  = SCREEN_WIDTH,
@@ -67,9 +68,7 @@ public class Window {
 		init();
 	}
 	
-	public void addRenderer(Renderer renderer) { renderers.add(renderer); }
-	
-	public void removeRenderer(Renderer renderer) { renderers.remove(renderer); }
+	public void addShader(Shader shader) { shaders.add(shader); }
 	
 	public String getTitle() { return title; }
 	
@@ -123,19 +122,18 @@ public class Window {
 			@Override public void run() {
 				
 				create();
-				renderers.forEach(Renderer::init);
+				shaders.forEach(Shader::doInit);
 				open = true;
-				
 				releaseLock();
 				
 				while(!Display.isCloseRequested() && open) {
 					
 					update();
-					renderers.forEach(Renderer::render);
+					shaders.forEach(Shader::doRender);
 				}
+				shaders.forEach(Shader::destroy);
 				
 				acquireLock();
-				renderers.forEach(Renderer::stop);
 				Display.destroy();
 				open = false;
 				releaseLock();

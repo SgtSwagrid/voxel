@@ -22,9 +22,9 @@ public class LocalPlayer extends Entity {
 	
 	private static final float MOVE_SPEED = 0.5F;
 	
-	public LocalPlayer() {
+	public LocalPlayer(World world) {
 		
-		super(MODEL);
+		super(world, MODEL);
 		
 		Event.addHandler(KeyHoldEvent.class, e -> {
 			switch(e.KEY_NAME) {

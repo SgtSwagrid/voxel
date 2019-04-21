@@ -15,12 +15,8 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import engine.event.Event;
-import engine.model.Mesh;
-import engine.model.Texture;
-import engine.render.Camera;
-import engine.render.Window.WindowResizeEvent;
 import engine.util.Files;
+import engine.util.math.Transform;
 
 /**
  * Superclass for all shader classes.
@@ -29,52 +25,51 @@ import engine.util.Files;
  */
 public abstract class Shader {
 	
-	private final int SHADER_PROGRAM_ID, VERTEX_SHADER_ID, FRAGMENT_SHADER_ID;
+	private int shaderProgramId, vertexShaderId, fragmentShaderId;
+	private String vertexShaderFile, fragmentShaderFile;
 	
 	private Map<String, Integer> uniforms = new HashMap<>();
 	
 	protected Shader(String vertexShader, String fragmentShader) {
+		vertexShaderFile = vertexShader;
+		fragmentShaderFile = fragmentShader;
+	}
+	
+	protected abstract void bindAttribs();
+	protected abstract void init();
+	protected abstract void render();
+	
+	public void doInit() {
 		
 		//Parse shader source files.
-		VERTEX_SHADER_ID = parseShader(vertexShader, GL_VERTEX_SHADER);
-		FRAGMENT_SHADER_ID = parseShader(fragmentShader, GL_FRAGMENT_SHADER);
+		vertexShaderId = parseShader(vertexShaderFile, GL_VERTEX_SHADER);
+		fragmentShaderId = parseShader(fragmentShaderFile, GL_FRAGMENT_SHADER);
 		
 		//Create new shader program.
-		SHADER_PROGRAM_ID = glCreateProgram();
+		shaderProgramId = glCreateProgram();
 		
 		//Attach custom shaders to shader program.
-		glAttachShader(SHADER_PROGRAM_ID, VERTEX_SHADER_ID);
-		glAttachShader(SHADER_PROGRAM_ID, FRAGMENT_SHADER_ID);
+		glAttachShader(shaderProgramId, vertexShaderId);
+		glAttachShader(shaderProgramId, fragmentShaderId);
 		
 		//Bind input attribute locations.
 		bindAttribs();
 		
-		glLinkProgram(SHADER_PROGRAM_ID);
-		glValidateProgram(SHADER_PROGRAM_ID);
+		glLinkProgram(shaderProgramId);
+		glValidateProgram(shaderProgramId);
 		
 		//Run any shader specific initialisation.
-		glUseProgram(SHADER_PROGRAM_ID);
+		glUseProgram(shaderProgramId);
 		init();
 		glUseProgram(0);
-		
-		//Call onWindowResize when the window is resized.
-		Event.addHandler(WindowResizeEvent.class, e -> {
-			onWindowResize(e.WIDTH, e.HEIGHT);
-		});
 	}
 	
 	/**
 	 * Start rendering using this shader.
 	 */
-	public void start(Camera c) {
-		glUseProgram(SHADER_PROGRAM_ID);
-		loadFrame(c);
-	}
-	
-	/**
-	 * Stop rendering using this shader.
-	 */
-	public void stop() {
+	public void doRender() {
+		glUseProgram(shaderProgramId);
+		render();
 		glUseProgram(0);
 	}
 	
@@ -83,22 +78,22 @@ public abstract class Shader {
 	 */
 	public void destroy() {
 		
-		stop();
+		glUseProgram(0);
 		
 		//Remove custom shaders from shader program.
-		glDetachShader(SHADER_PROGRAM_ID, VERTEX_SHADER_ID);
-		glDetachShader(SHADER_PROGRAM_ID, FRAGMENT_SHADER_ID);
+		glDetachShader(shaderProgramId, vertexShaderId);
+		glDetachShader(shaderProgramId, fragmentShaderId);
 		
 		//Delete custom shaders.
-		glDeleteShader(VERTEX_SHADER_ID);
-		glDeleteShader(FRAGMENT_SHADER_ID);
+		glDeleteShader(vertexShaderId);
+		glDeleteShader(fragmentShaderId);
 		
 		//Delete shader program.
-		glDeleteProgram(SHADER_PROGRAM_ID);
+		glDeleteProgram(shaderProgramId);
 	}
 	
 	protected void bindAttrib(int vaoId, String name) {
-		glBindAttribLocation(SHADER_PROGRAM_ID, vaoId, name);
+		glBindAttribLocation(shaderProgramId, vaoId, name);
 	}
 	
 	protected void setUniform(String name, int value) {
@@ -175,22 +170,13 @@ public abstract class Shader {
 		glUniformMatrix4(locationOf(name), false, m4b);
 	}
 	
-	protected abstract void bindAttribs();
-	protected abstract void init();
-	protected abstract void loadFrame(Camera c);
-	protected abstract void onWindowResize(int width, int height);
-	
-	public abstract void loadMesh(Mesh m);
-	public abstract void unloadMesh();
-	public abstract void loadTexture(Texture t);
-	
 	/**
 	 * Returns the location of the uniform variable of the given name.
 	 */
 	private int locationOf(String name) {
 		//Query OpenGL for the uniform location if it isn't yet stored in uniforms.
 		if(!uniforms.containsKey(name)) {
-			uniforms.put(name, glGetUniformLocation(SHADER_PROGRAM_ID, name));
+			uniforms.put(name, glGetUniformLocation(shaderProgramId, name));
 		}
 		return uniforms.get(name);
 	}
@@ -214,7 +200,25 @@ public abstract class Shader {
 			System.err.println(glGetShaderInfoLog(shaderId, 500));
 			System.exit(0);
 		}
-		
 		return shaderId;
+	}
+	
+	public static class Viewport {
+		
+		public final float X1, Y1, X2, Y2;
+		
+		private Transform transf = new Transform();
+		
+		public Viewport() {
+			this(-1.0F, -1.0F, 1.0F, 1.0F);
+		}
+		
+		public Viewport(float x1, float y1, float x2, float y2) {
+			transf.setPosition(new Vector2f((x2 - x1) / 2.0F - 1.0F, (y2 - y1) / 2.0F - 1.0F));
+			transf.setScale(new Vector2f((x2 - x1) / 2.0F, (y2 - y1) / 2.0F));
+			X1 = x1; Y1 = y1; X2 = x2; Y2 = y2;
+		}
+		
+		public Matrix4f getMatrix() { return transf.asMatrix(); }
 	}
 }

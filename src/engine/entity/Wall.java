@@ -16,7 +16,7 @@ public class Wall extends Entity {
 						Colour.WHITE)
 	);
 	
-	public Wall() { super(MODEL); }
+	public Wall(World world) { super(world, MODEL); }
 	
-	public Wall(Transform transform) { super(MODEL, transform); }
+	public Wall(World world, Transform transform) { super(world, MODEL, transform); }
 }

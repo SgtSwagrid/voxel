@@ -1,7 +1,6 @@
 package engine.entity;
 
 import engine.model.Model;
-import engine.render.WorldRenderer;
 import engine.util.math.Transform;
 
 public abstract class Entity {
@@ -10,13 +9,13 @@ public abstract class Entity {
 	
 	private Model model;
 	
-	public Entity(Model model) {
+	public Entity(World world, Model model) {
 		this.model = model;
-		WorldRenderer.INSTANCE.addEntity(this);
+		world.addEntity(this);
 	}
 	
-	public Entity(Model model, Transform transform) {
-		this(model);
+	public Entity(World world, Model model, Transform transform) {
+		this(world, model);
 		transf.loadTransformation(transform);
 	}
 	
