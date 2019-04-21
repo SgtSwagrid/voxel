@@ -1,12 +1,20 @@
 package engine.util;
 
 import engine.event.Event;
+import engine.render.Window;
 
 /**
  * Helper class featuring timing-related utilities and events.
  * @author Alec
  */
 public class Timing {
+	
+	/** The target time in milliseconds between ticks. */
+	public static final double TICK_LENGTH_MS = 20.0;
+	
+	/** The time at which the previous (most recent) tick occurred. */
+	private static double lastTick = getTime();
+	
 	
 	/** The difference between the local time and server time. */
 	private static long offset = 0;
@@ -22,19 +30,27 @@ public class Timing {
 	}
 	
 	/**
-	 * Update timing related functions. Call this as often as possible.
+	 * 
+	 * @param window
 	 */
-	public static void update() {
-		GameTickEvent.update();
+	public static void init(Window window) {
+		
+		new Thread("game-tick") {
+			@Override public void run() {
+				
+				while(window.isOpen()) {
+					
+					//Trigger the event if a sufficient time has passed.
+					if(getTime() - lastTick >= TICK_LENGTH_MS) {
+						new GameTickEvent(getTime() - lastTick);
+						lastTick += TICK_LENGTH_MS;
+					}
+				}
+			}
+		}.start();
 	}
 	
 	public static class GameTickEvent extends Event {
-		
-		/** The target time in milliseconds between ticks. */
-		public static final double TICK_LENGTH_MS = 20.0;
-		
-		/** The time at which the previous (most recent) tick occurred. */
-		private static double lastTick = getTime();
 		
 		/**
 		 * The amount of time which has passed (in milliseconds) since the previous tick.
@@ -49,19 +65,6 @@ public class Timing {
 		private GameTickEvent(double delta) {
 			DELTA = delta;
 			trigger();
-		}
-		
-		/**
-		 * Making a call to this method as often as possible is necessary for this event to function.
-		 * This will trigger a new GameTickEvent whenever it is appropriate.
-		 */
-		private static void update() {
-			
-			//Trigger the event if a sufficient time has passed.
-			if(getTime() - lastTick >= TICK_LENGTH_MS) {
-				new GameTickEvent(getTime() - lastTick);
-				lastTick += TICK_LENGTH_MS;
-			}
 		}
 	}
 }

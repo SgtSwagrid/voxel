@@ -1,6 +1,5 @@
 package engine.launch;
 
-import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
 import engine.entity.Wall;
@@ -13,7 +12,7 @@ import engine.render.Window;
 import engine.render.light.DirectionalLight;
 import engine.util.Colour;
 import engine.util.Timing;
-import engine.event.input.InputEvent.KeyboardEvent.KeyPressEvent;
+import engine.util.Timing.GameTickEvent;
 
 public class Client {
 	
@@ -25,28 +24,18 @@ public class Client {
 		
 		Window window = new Window("Engine");
 		window.setColour(Colour.TEAL);
-		
 		window.addRenderer(ENTITY_RENDERER);
+		window.open();
 		
-		while(!window.isOpen()) {}
-		
-		Event.addHandler(KeyPressEvent.class, e -> {
-			if(e.KEY_ID == Keyboard.KEY_F) {
-				System.out.println("Press F to pay respects.");
-			}
-		});
+		Input.init(window);
+		Timing.init(window);
 		
 		CAMERA.getTransform().setPosition(new Vector3f(0.0F, 0.0F, 10.0F));
+		Wall cube = new Wall(WORLD);
+		new DirectionalLight(WORLD, Colour.WHITE, new Vector3f(0.0F, -1.0F, -1.0F));
 		
-		Wall w = new Wall(WORLD);
-		
-		WORLD.addLight(new DirectionalLight(Colour.WHITE, new Vector3f(0.0F, -1.0F, -1.0F)));
-		
-		while(window.isOpen()) {
-			Timing.update();
-			Input.update(window);
+		Event.addHandler(GameTickEvent.class, e ->
+				cube.getTransform().rotate(new Vector3f(0.5F, 0.0F, 0.0F)));
 			
-			w.getTransform().rotate(new Vector3f(0.000005F, 0.0F, 0.0F));
-		}
 	}
 }

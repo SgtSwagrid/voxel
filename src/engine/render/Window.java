@@ -7,7 +7,6 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ContextAttribs;
@@ -17,6 +16,7 @@ import org.lwjgl.opengl.PixelFormat;
 
 import engine.util.Colour;
 import engine.event.Event;
+import engine.event.input.Input;
 
 public class Window {
 	
@@ -39,8 +39,6 @@ public class Window {
 	
 	private int maxFps = 240;
 	
-	private Semaphore lock = new Semaphore(1);
-	
 	static {
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		SCREEN_WIDTH = (int) screen.getWidth();
@@ -48,26 +46,28 @@ public class Window {
 	}
 	
 	public Window() {
-		init();
 	}
 	
 	public Window(int width, int height) {
 		setSize(width, height);
-		init();
 	}
 	
 	public Window(String title) {
 		this.title = title;
-		init();
 	}
 	
 	public Window(int width, int height, String title) {
 		setSize(width, height);
 		this.title = title;
-		init();
 	}
 	
-	public void addRenderer(Renderer renderer) { renderers.add(renderer); }
+	public void addRenderer(Renderer renderer) {
+		
+		if(open)
+			throw new IllegalStateException("Renderers can't be added after the window is open.");
+		
+		renderers.add(renderer);
+	}
 	
 	public String getTitle() { return title; }
 	
@@ -113,17 +113,14 @@ public class Window {
 	
 	public void setMaxFps(int maxFps) { this.maxFps = maxFps; }
 	
-	private void init() {
+	public void open() {
 		
-		acquireLock();
-		
-		new Thread("Window") {
+		new Thread("render") {
 			@Override public void run() {
 				
 				create();
 				renderers.forEach(Renderer::doInit);
 				open = true;
-				releaseLock();
 				
 				while(!Display.isCloseRequested() && open) {
 					
@@ -132,12 +129,12 @@ public class Window {
 				}
 				renderers.forEach(Renderer::destroy);
 				
-				acquireLock();
 				Display.destroy();
 				open = false;
-				releaseLock();
 			}
 		}.start();
+		
+		while(!open);
 	}
 	
 	/**
@@ -164,11 +161,6 @@ public class Window {
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK);
-		
-		/*Event.addHandler(WindowResizeEvent.class, e -> {
-			//glViewport(0, 0, e.WIDTH, e.HEIGHT);
-			update();
-		});*/
 	}
 	
 	private void update() {
@@ -230,18 +222,6 @@ public class Window {
 		glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 		glClearColor(colour.R, colour.G, colour.B, colour.A);
-	}
-	
-	public void acquireLock() {
-		try {
-			lock.acquire();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public void releaseLock() {
-		lock.release();
 	}
 	
 	public static class WindowResizeEvent extends Event {

@@ -28,7 +28,7 @@ public class Input {
 	/** The set of all mouse buttons which are currently held down.  */
 	private static Set<Integer> heldButtons = new HashSet<>();
 	
-	static {
+	public static void init(Window window) {
 		
 		try {
 			//Initialize keyboard and mouse.
@@ -51,22 +51,19 @@ public class Input {
 				new ClickHoldEvent(button, Mouse.getX(), Mouse.getY());
 			}
 		});
-	}
-	
-	/**
-	 * Must be called as often as possible to manage user input and related events.
-	 */
-	public static void update(Window window) {
 		
-		window.acquireLock();
-		if(!window.isOpen()) return;
-		
-		updateKeyboard();
-		updateMouseClicks();
-		updateCursor();
-		updateScrollWheel();
-		
-		window.releaseLock();
+		new Thread("input") {
+			@Override public void run() {
+				
+				while(window.isOpen()) {
+					
+					updateKeyboard();
+					updateMouseClicks();
+					updateCursor();
+					updateScrollWheel();
+				}
+			}
+		}.start();
 	}
 	
 	/**

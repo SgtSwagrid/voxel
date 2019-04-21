@@ -15,6 +15,8 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import engine.event.Event;
+import engine.render.Window.WindowResizeEvent;
 import engine.util.Files;
 import engine.util.math.Transform;
 
@@ -30,6 +32,8 @@ public abstract class Renderer {
 	
 	private Map<String, Integer> uniforms = new HashMap<>();
 	
+	private volatile boolean resized = false;
+	
 	protected Renderer(String vertexShader, String fragmentShader) {
 		vertexShaderFile = vertexShader;
 		fragmentShaderFile = fragmentShader;
@@ -37,6 +41,7 @@ public abstract class Renderer {
 	
 	protected abstract void bindAttribs();
 	protected abstract void init();
+	protected abstract void onWindowResize();
 	protected abstract void render();
 	
 	public void doInit() {
@@ -62,13 +67,21 @@ public abstract class Renderer {
 		glUseProgram(shaderProgramId);
 		init();
 		glUseProgram(0);
+		
+		Event.addHandler(WindowResizeEvent.class, e -> resized = true);
 	}
 	
 	/**
 	 * Start rendering using this shader.
 	 */
 	public void doRender() {
+		
 		glUseProgram(shaderProgramId);
+		
+		if(resized) {
+			onWindowResize();
+			resized = false;
+		}
 		render();
 		glUseProgram(0);
 	}

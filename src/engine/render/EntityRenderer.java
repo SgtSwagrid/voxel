@@ -62,16 +62,19 @@ public class EntityRenderer extends Renderer {
 	
 	@Override
 	protected void init() {
+		
 		Shapes.CUBE.getClass();
 		
 		loadProjection();
-		Event.addHandler(WindowResizeEvent.class, e -> loadProjection());
 		
 		for(int i = 0; i < NUM_LIGHTS; i++) {
 			setUniform("lights[" + i + "].colour", Colour.BLACK.asVector());
 			setUniform("lights[" + i + "].direction", new Vector3f(0.0F, 0.0F, -1.0F));
 		}
 	}
+	
+	@Override
+	protected void onWindowResize() { loadProjection(); }
 	
 	private void loadProjection() {
 		
