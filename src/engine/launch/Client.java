@@ -8,9 +8,9 @@ import engine.entity.World;
 import engine.event.Event;
 import engine.event.input.Input;
 import engine.render.Camera;
+import engine.render.EntityRenderer;
 import engine.render.Window;
 import engine.render.light.DirectionalLight;
-import engine.render.shader.EntityShader;
 import engine.util.Colour;
 import engine.util.Timing;
 import engine.event.input.InputEvent.KeyboardEvent.KeyPressEvent;
@@ -19,14 +19,14 @@ public class Client {
 	
 	public static final World WORLD = new World();
 	public static final Camera CAMERA = new Camera(WORLD);
-	public static final EntityShader ENTITY_SHADER = new EntityShader(CAMERA);
+	public static final EntityRenderer ENTITY_RENDERER = new EntityRenderer(CAMERA);
 	
 	public static void main(String[] args) {
 		
 		Window window = new Window("Engine");
 		window.setColour(Colour.TEAL);
 		
-		window.addShader(ENTITY_SHADER);
+		window.addRenderer(ENTITY_RENDERER);
 		
 		while(!window.isOpen()) {}
 		

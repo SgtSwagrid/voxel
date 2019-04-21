@@ -1,4 +1,4 @@
-package engine.render.shader;
+package engine.render;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
@@ -23,14 +23,14 @@ import engine.util.math.Transform;
  * Contains code for loading shaders from file.
  * @author Alec
  */
-public abstract class Shader {
+public abstract class Renderer {
 	
 	private int shaderProgramId, vertexShaderId, fragmentShaderId;
 	private String vertexShaderFile, fragmentShaderFile;
 	
 	private Map<String, Integer> uniforms = new HashMap<>();
 	
-	protected Shader(String vertexShader, String fragmentShader) {
+	protected Renderer(String vertexShader, String fragmentShader) {
 		vertexShaderFile = vertexShader;
 		fragmentShaderFile = fragmentShader;
 	}

@@ -1,4 +1,4 @@
-package engine.render.shader;
+package engine.render;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
@@ -18,14 +18,13 @@ import engine.event.Event;
 import engine.model.Material;
 import engine.model.Mesh;
 import engine.model.Texture;
-import engine.render.Camera;
 import engine.render.Window.WindowResizeEvent;
 import engine.render.light.DirectionalLight;
 import engine.temp.Shapes;
 import engine.util.Colour;
 import engine.util.math.Matrix;
 
-public class EntityShader extends Shader {
+public class EntityRenderer extends Renderer {
 	
 	private static final String VERTEX_SHADER   = "src/engine/render/shader/world_vertex.shdr",
 								FRAGMENT_SHADER = "src/engine/render/shader/world_fragment.shdr";
@@ -42,11 +41,11 @@ public class EntityShader extends Shader {
 	
 	private Map<Mesh, Map<Texture, Set<Entity>>> entities;
 	
-	public EntityShader(Camera camera) {
+	public EntityRenderer(Camera camera) {
 		this(camera, new Viewport());
 	}
 	
-	public EntityShader(Camera camera, Viewport viewport) {
+	public EntityRenderer(Camera camera, Viewport viewport) {
 		super(VERTEX_SHADER, FRAGMENT_SHADER);
 		this.camera = camera;
 		world = camera.getWorld();
