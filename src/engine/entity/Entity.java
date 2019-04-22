@@ -7,7 +7,7 @@ public abstract class Entity {
 	
 	private World world;
 	
-	private Transform transf;
+	private Transform transf = new Transform();
 	
 	private Model model;
 	
