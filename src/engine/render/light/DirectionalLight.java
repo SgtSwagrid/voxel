@@ -2,7 +2,7 @@ package engine.render.light;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import engine.entity.World;
+import engine.World;
 import engine.util.Colour;
 
 public class DirectionalLight extends Light {

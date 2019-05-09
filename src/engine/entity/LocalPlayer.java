@@ -3,6 +3,7 @@ package engine.entity;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
+import engine.World;
 import engine.event.Event;
 import engine.event.input.InputEvent.KeyboardEvent.KeyHoldEvent;
 import engine.event.input.InputEvent.MouseEvent.MouseMoveEvent;

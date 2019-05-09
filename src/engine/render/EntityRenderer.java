@@ -12,8 +12,8 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
+import engine.World;
 import engine.entity.Entity;
-import engine.entity.World;
 import engine.model.Material;
 import engine.model.Mesh;
 import engine.model.Texture;
@@ -164,7 +164,7 @@ public class EntityRenderer extends Renderer {
 	
 	private void loadTexture(Texture t) {
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D,t.getTextureId());
+		glBindTexture(GL_TEXTURE_2D, t.getTextureId());
 		
 		if(t.isOpaque()) glEnable(GL_CULL_FACE);
 		else glDisable(GL_CULL_FACE);

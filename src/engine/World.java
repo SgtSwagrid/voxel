@@ -1,17 +1,22 @@
-package engine.entity;
+package engine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
+import engine.entity.Entity;
 import engine.model.Mesh;
 import engine.model.Texture;
 import engine.render.light.Light;
+import engine.voxel.VoxelGrid;
 
 public class World {
+	
+	private Optional<VoxelGrid> voxels = Optional.empty();
 	
 	private Set<Entity> entities = new HashSet<>();
 	private Map<Mesh, Map<Texture, Set<Entity>>> indexedEntities = new HashMap<>();
@@ -20,6 +25,10 @@ public class World {
 	
 	public Map<Mesh, Map<Texture, Set<Entity>>> getRenderIndexedEntities() {
 		return indexedEntities;
+	}
+	
+	public void setVoxelGrid(VoxelGrid voxels) {
+		this.voxels = Optional.of(voxels);
 	}
 	
 	public void addEntity(Entity entity) {

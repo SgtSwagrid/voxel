@@ -2,8 +2,8 @@ package engine.launch;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import engine.World;
 import engine.entity.Wall;
-import engine.entity.World;
 import engine.event.Event;
 import engine.event.input.Input;
 import engine.render.Camera;

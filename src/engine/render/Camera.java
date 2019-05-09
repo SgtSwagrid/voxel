@@ -2,7 +2,7 @@ package engine.render;
 
 import org.lwjgl.util.vector.Matrix4f;
 
-import engine.entity.World;
+import engine.World;
 import engine.util.math.Transform;
 
 /**

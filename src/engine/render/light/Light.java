@@ -1,6 +1,6 @@
 package engine.render.light;
 
-import engine.entity.World;
+import engine.World;
 import engine.util.Colour;
 
 public abstract class Light {

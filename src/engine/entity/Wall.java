@@ -1,5 +1,6 @@
 package engine.entity;
 
+import engine.World;
 import engine.model.Material;
 import engine.model.Model;
 import engine.model.Texture;
