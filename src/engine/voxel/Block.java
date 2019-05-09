@@ -2,7 +2,7 @@ package engine.voxel;
 
 import engine.model.Texture;
 
-public class Block {
+public abstract class Block {
 	
 	public enum Side { TOP, BOTTOM, NORTH, EAST, SOUTH, WEST }
 	
